@@ -22,3 +22,5 @@ matplotlib
 reportlab
 pdfkit
 utils
+pymongo
+python-dotenv
