@@ -50,7 +50,7 @@ def serialize_row(row):
 
 if env == 'development':
     # MySQL Configuration
-    DATABASE_URL = os.getenv('mysql+pymysql://root:@localhost/qrconnect')
+    DATABASE_URL = os.getenv('mysql+mysqlconnector://root:@localhost/qrconnect')
     engine = create_engine(DATABASE_URL)
     Session = sessionmaker(bind=engine)
     session = Session()
