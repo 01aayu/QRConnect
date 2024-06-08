@@ -51,6 +51,9 @@ def serialize_row(row):
 if env == 'development':
     # MySQL Configuration
     DATABASE_URL = os.getenv('mysql+mysqlconnector://root:@localhost/qrconnect')
+    print(f"DATABASE_URL: {DATABASE_URL}")  # Debugging line
+    if not DATABASE_URL:
+        raise ValueError("No DATABASE_URL set for Flask application")
     engine = create_engine(DATABASE_URL)
     Session = sessionmaker(bind=engine)
     session = Session()
