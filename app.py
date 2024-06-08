@@ -1,5 +1,12 @@
 import os
-from flask import Flask, session, render_template, request, redirect, url_for, flash
+from flask import Flask, session, render_template, request, redirect, url_for, flash, jsonify
+from pymongo import MongoClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from dotenv import load_dotenv
+import datetime
 from flask_session import Session
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
@@ -26,9 +33,118 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib import utils
 from reportlab.graphics.shapes import Drawing, Rect
 
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
+env = os.getenv('FLASK_ENV', 'development')
+
+def serialize_row(row):
+    serialized = {}
+    for column in row.keys():
+        value = getattr(row, column)
+        if isinstance(value, datetime.datetime):
+            value = value.isoformat()
+        serialized[column] = value
+    return serialized
+
+if env == 'development':
+    # MySQL Configuration
+    DATABASE_URL = os.getenv('mysql+pymysql://root:@localhost/qrconnect')
+    engine = create_engine(DATABASE_URL)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # @app.route('/students', methods=['GET'])
+    # def get_students_mysql():
+    #     result = session.execute('SELECT * FROM students')
+    #     students = [serialize_row(row) for row in result]
+    #     return jsonify(students)
+
+    @app.route('/mentors', methods=['GET'])
+    def get_mentors_mysql():
+        result = session.execute('SELECT * FROM mentors')
+        mentors = [serialize_row(row) for row in result]
+        return jsonify(mentors)
+
+    @app.route('/assigned_mentees', methods=['GET'])
+    def get_assigned_mentees_mysql():
+        result = session.execute('SELECT * FROM assigned_mentees')
+        assigned_mentees = [serialize_row(row) for row in result]
+        return jsonify(assigned_mentees)
+
+    @app.route('/mentees', methods=['GET'])
+    def get_mentees_mysql():
+        result = session.execute('SELECT * FROM mentees')
+        mentees = [serialize_row(row) for row in result]
+        return jsonify(mentees)
+
+    @app.route('/mentees_grades', methods=['GET'])
+    def get_mentees_grades_mysql():
+        result = session.execute('SELECT * FROM mentees_grades')
+        mentees_grades = [serialize_row(row) for row in result]
+        return jsonify(mentees_grades)
+
+    @app.route('/resources', methods=['GET'])
+    def get_resources_mysql():
+        result = session.execute('SELECT * FROM resources')
+        resources = [serialize_row(row) for row in result]
+        return jsonify(resources) 
+    
+else:
+    # MongoDB Configuration
+    MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.jxpkrlg.mongodb.net/?retryWrites=true&w=majority&appName=mentor-mentee')
+    client = MongoClient(MONGO_URI)
+    db = client.get_database('mentor-mentee')
+    # students_collection = db['students']
+    mentors_collection = db['mentors']
+    assigned_mentees_collection = db['assigned_mentees']
+    mentees_collection = db['mentees']
+    mentees_grades_collection = db['mentees_grades']
+    resources_collection = db['resources']
+
+    # @app.route('/students', methods=['GET'])
+    # def get_students_mongodb():
+    #     students = list(students_collection.find())
+    #     for student in students:
+    #         student['_id'] = str(student['_id'])  # Convert ObjectId to string
+    #     return jsonify(students)
+
+    @app.route('/mentors', methods=['GET'])
+    def get_mentors_mongodb():
+        mentors = list(mentors_collection.find())
+        for mentor in mentors:
+            mentor['_id'] = str(mentor['_id'])  # Convert ObjectId to string
+        return jsonify(mentors)
+
+    @app.route('/assigned_mentees', methods=['GET'])
+    def get_assigned_mentees_mongodb():
+        assigned_mentees = list(assigned_mentees_collection.find())
+        for assigned_mentee in assigned_mentees:
+            assigned_mentee['_id'] = str(assigned_mentee['_id'])  # Convert ObjectId to string
+        return jsonify(assigned_mentees)
+
+    @app.route('/mentees', methods=['GET'])
+    def get_mentees_mongodb():
+        mentees = list(mentees_collection.find())
+        for mentee in mentees:
+            mentee['_id'] = str(mentee['_id'])  # Convert ObjectId to string
+        return jsonify(mentees)
+
+    @app.route('/mentees_grades', methods=['GET'])
+    def get_mentees_grades_mongodb():
+        mentees_grades = list(mentees_grades_collection.find())
+        for mentee_grade in mentees_grades:
+            mentee_grade['_id'] = str(mentee_grade['_id'])  # Convert ObjectId to string
+        return jsonify(mentees_grades)
+
+    @app.route('/resources', methods=['GET'])
+    def get_resources_mongodb():
+        resources = list(resources_collection.find())
+        for resource in resources:
+            resource['_id'] = str(resource['_id'])  # Convert ObjectId to string
+        return jsonify(resources)
+
 
 mail = Mail(app)
 s = URLSafeTimedSerializer('Thisisasecret!')
@@ -1226,3 +1342,10 @@ def generate_pdf_content(mentee, mentee_grades, assigned_mentee, mentor_name, pl
     pdf_content = buffer.getvalue()
     buffer.close()
     return pdf_content
+
+@app.route('/')
+def home():
+    return "Welcome to the Flask app!"
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=8080)
