@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from dotenv import load_dotenv
-import datetime
+from datetime import datetime
 from flask_session import Session
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
@@ -36,17 +36,20 @@ from reportlab.graphics.shapes import Drawing, Rect
 load_dotenv()
 
 app = Flask(__name__)
+
+app.config["SECRET_KEY"] = os.getenv('SECRET_KEY', 'qrconnect')
+app.config["MAIL_SERVER"] = os.getenv('MAIL_SERVER')
+app.config["MAIL_USERNAME"] = os.getenv('MAIL_USERNAME')
+app.config["MAIL_PASSWORD"] = os.getenv('MAIL_PASSWORD')
+app.config["MAIL_PORT"] = int(os.getenv('MAIL_PORT', 465))
+app.config["MAIL_USE_TLS"] = os.getenv('MAIL_USE_TLS', 'False').lower() in ['true', '1', 't']
+app.config["MAIL_USE_SSL"] = os.getenv('MAIL_USE_SSL', 'True').lower() in ['true', '1', 't']
+
+mail = Mail(app)
+s = URLSafeTimedSerializer('Thisisasecret!')
+
 app.config.from_pyfile('config.cfg')
 env = os.getenv('FLASK_ENV', 'development')
-
-def serialize_row(row):
-    serialized = {}
-    for column in row.keys():
-        value = getattr(row, column)
-        if isinstance(value, datetime.datetime):
-            value = value.isoformat()
-        serialized[column] = value
-    return serialized
 
 if env == 'development':
     # MySQL Configuration
@@ -64,6 +67,36 @@ if env == 'development':
     #     students = [serialize_row(row) for row in result]
     #     return jsonify(students)
 
+    
+else:
+    # MongoDB Configuration
+    MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.jxpkrlg.mongodb.net/?retryWrites=true&w=majority&appName=mentor-mentee')
+    client = MongoClient(MONGO_URI)
+    db = client.get_database('mentor-mentee')
+    # students_collection = db['students']
+    mentors_collection = db['mentors']
+    assigned_mentees_collection = db['assigned_mentees']
+    mentees_collection = db['mentees']
+    mentees_grades_collection = db['mentees_grades']
+    resources_collection = db['resources']
+
+def serialize_row(row):
+    serialized = {}
+    for column in row.keys():
+        value = getattr(row, column)
+        if isinstance(value, datetime.datetime):
+            value = value.isoformat()
+        serialized[column] = value
+    return serialized
+
+    # @app.route('/students', methods=['GET'])
+    # def get_students_mongodb():
+    #     students = list(students_collection.find())
+    #     for student in students:
+    #         student['_id'] = str(student['_id'])  # Convert ObjectId to string
+    #     return jsonify(students)
+
+if env == 'development':
     @app.route('/mentors', methods=['GET'])
     def get_mentors_mysql():
         result = session.execute('SELECT * FROM mentors')
@@ -92,27 +125,8 @@ if env == 'development':
     def get_resources_mysql():
         result = session.execute('SELECT * FROM resources')
         resources = [serialize_row(row) for row in result]
-        return jsonify(resources) 
-    
+        return jsonify(resources)
 else:
-    # MongoDB Configuration
-    MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.jxpkrlg.mongodb.net/?retryWrites=true&w=majority&appName=mentor-mentee')
-    client = MongoClient(MONGO_URI)
-    db = client.get_database('mentor-mentee')
-    # students_collection = db['students']
-    mentors_collection = db['mentors']
-    assigned_mentees_collection = db['assigned_mentees']
-    mentees_collection = db['mentees']
-    mentees_grades_collection = db['mentees_grades']
-    resources_collection = db['resources']
-
-    # @app.route('/students', methods=['GET'])
-    # def get_students_mongodb():
-    #     students = list(students_collection.find())
-    #     for student in students:
-    #         student['_id'] = str(student['_id'])  # Convert ObjectId to string
-    #     return jsonify(students)
-
     @app.route('/mentors', methods=['GET'])
     def get_mentors_mongodb():
         mentors = list(mentors_collection.find())
@@ -149,12 +163,9 @@ else:
         return jsonify(resources)
 
 
-mail = Mail(app)
-s = URLSafeTimedSerializer('Thisisasecret!')
-
 # Configure session to use filesystem
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+mysqlconnector://root:@localhost/qrconnect"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+mysqlconnector://root:@localhost/qrconnect"
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
