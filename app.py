@@ -46,8 +46,8 @@ app.config["MAIL_USE_TLS"] = os.getenv('MAIL_USE_TLS', 'False').lower() in ['tru
 app.config["MAIL_USE_SSL"] = os.getenv('MAIL_USE_SSL', 'True').lower() in ['true', '1', 't']
 
 mail = Mail(app)
-s = URLSafeTimedSerializer('Thisisasecret!')
-# s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+# s = URLSafeTimedSerializer('Thisisasecret!')
+s = URLSafeTimedSerializer(app.config["Thisisasecret!"])
 
 app.config.from_pyfile('config.cfg')
 env = os.getenv('FLASK_ENV', 'development')
@@ -175,6 +175,12 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+@app.route('/')
+def home():
+    return "Welcome to the Flask app!"
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=8080)
 
 @app.route("/")
 def login():
@@ -1358,9 +1364,4 @@ def generate_pdf_content(mentee, mentee_grades, assigned_mentee, mentor_name, pl
     buffer.close()
     return pdf_content
 
-@app.route('/')
-def home():
-    return "Welcome to the Flask app!"
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080)
