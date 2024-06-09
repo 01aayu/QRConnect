@@ -24,3 +24,4 @@ pdfkit
 utils
 pymongo
 python-dotenv
+gunicorn
