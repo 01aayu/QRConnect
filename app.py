@@ -37,7 +37,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config["SECRET_KEY"] = os.getenv('SECRET_KEY', 'qrconnect')
+app.config["SECRET_KEY"] = os.getenv('SECRET_KEY', 'Thisisasecret!')
 app.config["MAIL_SERVER"] = os.getenv('MAIL_SERVER')
 app.config["MAIL_USERNAME"] = os.getenv('MAIL_USERNAME')
 app.config["MAIL_PASSWORD"] = os.getenv('MAIL_PASSWORD')
@@ -46,8 +46,8 @@ app.config["MAIL_USE_TLS"] = os.getenv('MAIL_USE_TLS', 'False').lower() in ['tru
 app.config["MAIL_USE_SSL"] = os.getenv('MAIL_USE_SSL', 'True').lower() in ['true', '1', 't']
 
 mail = Mail(app)
-# s = URLSafeTimedSerializer('Thisisasecret!')
-s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+s = URLSafeTimedSerializer('Thisisasecret!')
+# s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
 app.config.from_pyfile('config.cfg')
 env = os.getenv('FLASK_ENV', 'development')
