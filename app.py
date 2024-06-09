@@ -47,14 +47,14 @@ app.config["MAIL_USE_SSL"] = os.getenv('MAIL_USE_SSL', 'True').lower() in ['true
 
 mail = Mail(app)
 # s = URLSafeTimedSerializer('Thisisasecret!')
-s = URLSafeTimedSerializer(app.config["Thisisasecret!"])
+s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
 app.config.from_pyfile('config.cfg')
 env = os.getenv('FLASK_ENV', 'development')
 
 if env == 'development':
     # MySQL Configuration
-    DATABASE_URL = os.getenv('mysql+mysqlconnector://root:@localhost/qrconnect')
+    DATABASE_URL = os.getenv('mysql+mysqlconnector://root:mysql@localhost/qrconnect')
     print(f"DATABASE_URL: {DATABASE_URL}")  # Debugging line
     if not DATABASE_URL:
         raise ValueError("No DATABASE_URL set for Flask application")
