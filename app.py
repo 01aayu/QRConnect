@@ -54,7 +54,7 @@ env = os.getenv('FLASK_ENV', 'development')
 
 if env == 'development':
     # MySQL Configuration
-    DATABASE_URL = os.getenv('mysql+mysqlconnector://root:mysql@localhost/qrconnect')
+    DATABASE_URL = os.getenv('mysql+mysqlconnector://root:mysql@localhost:3306/qrconnect')
     print(f"DATABASE_URL: {DATABASE_URL}")  # Debugging line
     if not DATABASE_URL:
         raise ValueError("No DATABASE_URL set for Flask application")
