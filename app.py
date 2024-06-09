@@ -175,13 +175,6 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-@app.route('/')
-def home():
-    return "Welcome to the Flask app!"
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080)
-
 @app.route("/")
 def login():
     if session.get("username") == None:
@@ -1363,5 +1356,12 @@ def generate_pdf_content(mentee, mentee_grades, assigned_mentee, mentor_name, pl
     pdf_content = buffer.getvalue()
     buffer.close()
     return pdf_content
+
+@app.route('/')
+def home():
+    return "Welcome to the Flask app!"
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=8080)
 
 
