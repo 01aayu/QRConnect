@@ -47,7 +47,7 @@ app.config["MAIL_USE_SSL"] = os.getenv('MAIL_USE_SSL', 'True').lower() in ['true
 
 mail = Mail(app)
 # s = URLSafeTimedSerializer('Thisisasecret!')
-s = URLSafeTimedSerializer('qrconnect')
+s = URLSafeTimedSerializer(app.config["qrconnect"])
 
 app.config.from_pyfile('config.cfg')
 env = os.getenv('FLASK_ENV', 'development')
