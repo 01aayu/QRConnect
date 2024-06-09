@@ -32,6 +32,22 @@ from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib import utils
 from reportlab.graphics.shapes import Drawing, Rect
+import logging
+
+# Configure logging (optional, adjust settings as needed)
+logging.basicConfig(filename='app.log', level=logging.DEBUG)  # Logs to a file named 'app.log'
+
+def get_database_url():
+  """Retrieves the DATABASE_URL environment variable and logs its value."""
+  database_url = os.getenv('DATABASE_URL')
+  logging.debug(f"Retrieved DATABASE_URL: {database_url}")
+  return database_url
+
+# ... rest of your code
+
+if __name__ == '__main__':
+  database_url = get_database_url()  # Call the function to retrieve and log the URL
+  # ... rest of your code related to database connection (using database_url)
 
 load_dotenv()
 
