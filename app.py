@@ -1,10 +1,6 @@
 import os
 from flask import Flask, session, render_template, request, redirect, url_for, flash, jsonify
 from pymongo import MongoClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from dotenv import load_dotenv
 from datetime import datetime
 from flask_session import Session
@@ -52,15 +48,7 @@ s = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 app.config.from_pyfile('config.cfg')
 env = os.getenv('FLASK_ENV', 'development')
 
-if env == 'development':
-    # MySQL Configuration
-    DATABASE_URL = os.getenv('mysql+mysqlconnector://root:mysql@localhost:3306/qrconnect')
-    print(f"DATABASE_URL: {DATABASE_URL}")  # Debugging line
-    if not DATABASE_URL:
-        raise ValueError("No DATABASE_URL set for Flask application")
-    engine = create_engine(DATABASE_URL)
-    Session = sessionmaker(bind=engine)
-    session = Session()
+
 
     # @app.route('/students', methods=['GET'])
     # def get_students_mysql():
@@ -68,18 +56,16 @@ if env == 'development':
     #     students = [serialize_row(row) for row in result]
     #     return jsonify(students)
 
-    
-else:
     # MongoDB Configuration
-    MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.jxpkrlg.mongodb.net/?retryWrites=true&w=majority&appName=mentor-mentee')
-    client = MongoClient(MONGO_URI)
-    db = client.get_database('mentor-mentee')
+MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.jxpkrlg.mongodb.net/?retryWrites=true&w=majority&appName=mentor-mentee')
+client = MongoClient(MONGO_URI)
+db = client.get_database('mentor-mentee')
     # students_collection = db['students']
-    mentors_collection = db['mentors']
-    assigned_mentees_collection = db['assigned_mentees']
-    mentees_collection = db['mentees']
-    mentees_grades_collection = db['mentees_grades']
-    resources_collection = db['resources']
+mentors_collection = db['mentors']
+assigned_mentees_collection = db['assigned_mentees']
+mentees_collection = db['mentees']
+mentees_grades_collection = db['mentees_grades']
+resources_collection = db['resources']
 
 def serialize_row(row):
     serialized = {}
@@ -97,67 +83,37 @@ def serialize_row(row):
     #         student['_id'] = str(student['_id'])  # Convert ObjectId to string
     #     return jsonify(students)
 
-if env == 'development':
-    @app.route('/mentors', methods=['GET'])
-    def get_mentors_mysql():
-        result = session.execute('SELECT * FROM mentors')
-        mentors = [serialize_row(row) for row in result]
-        return jsonify(mentors)
 
-    @app.route('/assigned_mentees', methods=['GET'])
-    def get_assigned_mentees_mysql():
-        result = session.execute('SELECT * FROM assigned_mentees')
-        assigned_mentees = [serialize_row(row) for row in result]
-        return jsonify(assigned_mentees)
-
-    @app.route('/mentees', methods=['GET'])
-    def get_mentees_mysql():
-        result = session.execute('SELECT * FROM mentees')
-        mentees = [serialize_row(row) for row in result]
-        return jsonify(mentees)
-
-    @app.route('/mentees_grades', methods=['GET'])
-    def get_mentees_grades_mysql():
-        result = session.execute('SELECT * FROM mentees_grades')
-        mentees_grades = [serialize_row(row) for row in result]
-        return jsonify(mentees_grades)
-
-    @app.route('/resources', methods=['GET'])
-    def get_resources_mysql():
-        result = session.execute('SELECT * FROM resources')
-        resources = [serialize_row(row) for row in result]
-        return jsonify(resources)
-else:
-    @app.route('/mentors', methods=['GET'])
-    def get_mentors_mongodb():
+@app.route('/mentors', methods=['GET'])
+def get_mentors_mongodb():
         mentors = list(mentors_collection.find())
         for mentor in mentors:
             mentor['_id'] = str(mentor['_id'])  # Convert ObjectId to string
         return jsonify(mentors)
 
-    @app.route('/assigned_mentees', methods=['GET'])
-    def get_assigned_mentees_mongodb():
+@app.route('/assigned_mentees', methods=['GET'])
+def get_assigned_mentees_mongodb():
         assigned_mentees = list(assigned_mentees_collection.find())
         for assigned_mentee in assigned_mentees:
             assigned_mentee['_id'] = str(assigned_mentee['_id'])  # Convert ObjectId to string
         return jsonify(assigned_mentees)
 
-    @app.route('/mentees', methods=['GET'])
-    def get_mentees_mongodb():
+@app.route('/mentees', methods=['GET'])
+def get_mentees_mongodb():
         mentees = list(mentees_collection.find())
         for mentee in mentees:
             mentee['_id'] = str(mentee['_id'])  # Convert ObjectId to string
         return jsonify(mentees)
 
-    @app.route('/mentees_grades', methods=['GET'])
-    def get_mentees_grades_mongodb():
+@app.route('/mentees_grades', methods=['GET'])
+def get_mentees_grades_mongodb():
         mentees_grades = list(mentees_grades_collection.find())
         for mentee_grade in mentees_grades:
             mentee_grade['_id'] = str(mentee_grade['_id'])  # Convert ObjectId to string
         return jsonify(mentees_grades)
 
-    @app.route('/resources', methods=['GET'])
-    def get_resources_mongodb():
+@app.route('/resources', methods=['GET'])
+def get_resources_mongodb():
         resources = list(resources_collection.find())
         for resource in resources:
             resource['_id'] = str(resource['_id'])  # Convert ObjectId to string
