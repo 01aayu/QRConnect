@@ -57,15 +57,15 @@ env = os.getenv('FLASK_ENV', 'development')
     #     return jsonify(students)
 
     # MongoDB Configuration
-MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.jxpkrlg.mongodb.net/?retryWrites=true&w=majority&appName=mentor-mentee')
+MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.ubqiorq.mongodb.net/qrconnect?retryWrites=true&w=majority')
 client = MongoClient(MONGO_URI)
 db = client.get_database('mentor-mentee')
-    # students_collection = db['students']
+students_collection = db['students']
 mentors_collection = db['mentors']
 assigned_mentees_collection = db['assigned_mentees']
 mentees_collection = db['mentees']
-mentees_grades_collection = db['mentees_grades']
-resources_collection = db['resources']
+mentees_grades_collection = db['mentee_grades']
+resources_collection = db['resource']
 
 def serialize_row(row):
     serialized = {}
@@ -76,12 +76,12 @@ def serialize_row(row):
         serialized[column] = value
     return serialized
 
-    # @app.route('/students', methods=['GET'])
-    # def get_students_mongodb():
-    #     students = list(students_collection.find())
-    #     for student in students:
-    #         student['_id'] = str(student['_id'])  # Convert ObjectId to string
-    #     return jsonify(students)
+@app.route('/students', methods=['GET'])
+def get_students_mongodb():
+        students = list(students_collection.find())
+        for student in students:
+            student['_id'] = str(student['_id'])  # Convert ObjectId to string
+        return jsonify(students)
 
 
 @app.route('/mentors', methods=['GET'])

@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, jsonify, request
-from database import mentors_collection, assigned_mentees_collection, mentees_collection, mentees_grade_collection, resources_collection  # Import your MongoDB collections
+from database import mentors_collection, assigned_mentees_collection, mentees_collection, mentees_grades_collection, resources_collection, students_collection  # Import your MongoDB collections
 
 data_bp = Blueprint('data', __name__)
 
@@ -11,21 +11,17 @@ def get_data():
 
     if env == 'development':
         if table == 'mentors':
-            # Perform MongoDB query for students_collection
             data = list(mentors_collection.find())
         elif table == 'assigned_mentees':
-            # Perform MongoDB query for mentors_collection
             data = list(assigned_mentees_collection.find())
         elif table == 'mentees':
-            # Perform MongoDB query for mentors_collection
             data = list(mentees_collection.find())
-        elif table == 'mentees_grade':
-            # Perform MongoDB query for mentors_collection
-            data = list(mentees_grade_collection.find())
+        elif table == 'mentee_grades':
+            data = list(mentees_grades_collection.find())
         elif table == 'resources':
-            # Perform MongoDB query for mentors_collection
             data = list(resources_collection.find())
-        # Add other collections as needed
+        elif table == 'students':  # Handle students_collection
+            data = list(students_collection.find())
         else:
             return jsonify({"error": "Collection not found"}), 404
         
