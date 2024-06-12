@@ -57,7 +57,7 @@ env = os.getenv('FLASK_ENV', 'development')
     #     return jsonify(students)
 
     # MongoDB Configuration
-MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.ubqiorq.mongodb.net/qrconnect?retryWrites=true&w=majority')
+MONGO_URI = os.getenv('mongodb+srv://QrConnect:QrConnect@mentor-mentee.ubqiorq.mongodb.net/?retryWrites=true&w=majority&appName=mentor-mentee')
 client = MongoClient(MONGO_URI)
 db = client.get_database('mentor-mentee')
 students_collection = db['students']
