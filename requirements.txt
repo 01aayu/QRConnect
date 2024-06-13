@@ -3,14 +3,14 @@ chardet
 Click
 Flask
 Flask-Session
-Flask-SQLAlchemy
+#Flask-SQLAlchemy
 idna
 itsdangerous
 Jinja2
 MarkupSafe
 psycopg2-binary
 requests
-SQLAlchemy
+#SQLAlchemy
 urllib3
 Werkzeug
 mysql-connector-python
@@ -24,4 +24,4 @@ pdfkit
 utils
 pymongo
 python-dotenv
-gunicorn
+#gunicorn
