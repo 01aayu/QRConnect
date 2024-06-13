@@ -4,3 +4,5 @@ Flask-Mail
 pymongo
 python-dotenv
 qrcode
+Flask-SQLAlchemy
+SQLAlchemy
