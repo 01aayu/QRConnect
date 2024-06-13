@@ -4,6 +4,3 @@ Flask-Mail
 pymongo
 python-dotenv
 qrcode
-pandas
-matplotlib
-reportlab
