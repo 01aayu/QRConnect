@@ -29,6 +29,8 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib import utils
 from reportlab.graphics.shapes import Drawing, Rect
 
+#changing version of node.js from 20 to 18 
+
 load_dotenv()
 
 app = Flask(__name__)
