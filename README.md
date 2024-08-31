@@ -1,4 +1,4 @@
-# QRConnect
+# SkillSpace
 
 **Overview**
 
@@ -44,6 +44,6 @@ Set up the MySQL database and configure the database connection in the Flask app
 
 Set up XAMPP for local development.
 
-Run the Flask application: python app.py
+Run the Flask application: python wsgi.py
 
 Access the application through the provided URL.
